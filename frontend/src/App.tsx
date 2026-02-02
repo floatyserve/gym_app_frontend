@@ -1,11 +1,12 @@
+import { AppLayout } from "./layouts/AppLayout";
+import { DashboardPage } from "./pages/DashboardPage";
 
 function App() {
-
-  return (
-    <>
-
-    </>
-  )
+    return (
+        <AppLayout>
+            <DashboardPage />
+        </AppLayout>
+    );
 }
 
-export default App
+export default App;
