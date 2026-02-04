@@ -16,7 +16,10 @@ export function Header() {
 
     return (
         <header className="w-full bg-slate-800 h-14 flex items-center justify-between px-6">
-            <div className="text-slate-100 font-semibold text-lg cursor-default">
+            <div className="text-slate-100 font-semibold text-lg cursor-default"
+                 onClick={() => navigate("/")}
+                 style={{cursor: "pointer"}}
+            >
                 Gym App
             </div>
 
@@ -25,6 +28,7 @@ export function Header() {
                     onClick={goToProfile}
                     className="text-slate-200 hover:text-white focus:outline-none"
                     aria-label="Profile"
+                    style={{ cursor: "pointer" }}
                 >
                     Profile
                 </button>
@@ -33,6 +37,7 @@ export function Header() {
                     onClick={handleLogout}
                     className="text-red-500 hover:text-red-400 focus:outline-none"
                     aria-label="Logout"
+                    style={{ cursor: "pointer" }}
                 >
                     Logout
                 </button>
