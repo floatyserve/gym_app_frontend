@@ -1,7 +1,13 @@
+import {AppLayout} from "../layouts/AppLayout.tsx";
+
 export function DashboardPage() {
     return (
-        <div className="text-lg">
-            Dashboard works
-        </div>
+        <>
+            <AppLayout>
+                <div className="text-lg">
+                    Dashboard works
+                </div>
+            </AppLayout>
+        </>
     );
 }
