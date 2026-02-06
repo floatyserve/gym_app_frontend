@@ -1,15 +1,8 @@
 import api from "./client";
-
-export interface LoginRequest {
-    email: string;
-    password: string;
-}
-
-export interface LoginResponse {
-    token: string;
-}
+import type {LoginRequest} from "../types/auth/LoginRequest.ts";
+import type {LoginResponse} from "../types/auth/LoginResponse.ts";
 
 export async function login(req: LoginRequest): Promise<LoginResponse> {
-    const { data } = await api.post<LoginResponse>("/auth/login", req);
+    const { data } = await api.post("/auth/login", req);
     return data;
 }
