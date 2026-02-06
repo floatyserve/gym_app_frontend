@@ -2,8 +2,8 @@ import {useEffect, useState} from "react";
 import {useAuth} from "../context/AuthContext";
 import {getById as getUserById} from "../api/user.api";
 import {getByUserId as getWorkerByUserId} from "../api/worker.api";
-import type {User} from "../types/User";
-import type {Worker} from "../types/Worker";
+import type {User} from "../types/user/User.ts";
+import type {Worker} from "../types/worker/Worker.ts";
 import {AppLayout} from "../layouts/AppLayout.tsx";
 
 export function ProfilePage() {
