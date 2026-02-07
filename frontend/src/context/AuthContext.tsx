@@ -1,6 +1,6 @@
 import React, { createContext, useState, useEffect, useContext } from "react";
 import { jwtDecode } from "jwt-decode";
-import api from "../api/client";
+import api from "../api/api.ts";
 import type {User} from "../types/user/User.ts";
 import {getById} from "../api/user.api.ts";
 import {login as apiLogin} from "../api/auth.api.ts";

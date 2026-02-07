@@ -2,12 +2,16 @@ import { useEffect, useState } from "react";
 import { getStats } from "../api/locker.api";
 import type { LockerStats } from "../types/locker/LockerStats";
 
-export function LockerSnapshot() {
+interface Props {
+    refreshTrigger: number;
+}
+
+export function LockerSnapshot({ refreshTrigger }: Props) {
     const [stats, setStats] = useState<LockerStats | null>(null);
 
     useEffect(() => {
         getStats().then(setStats);
-    }, []);
+    }, [refreshTrigger]);
 
     if (!stats) {
         return <div className="bg-slate-800 p-4 rounded">Loading lockers…</div>;

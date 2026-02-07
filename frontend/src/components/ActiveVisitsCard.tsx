@@ -1,25 +1,50 @@
-import { type GridColDef } from "@mui/x-data-grid";
+import type { GridRowSelectionModel, GridColDef, GridRowId } from "@mui/x-data-grid";
+
+
 import { useEffect, useState } from "react";
 import { getAllActive, checkOut } from "../api/visit.api";
 import type { ActiveVisit } from "../types/visit/ActiveVisit";
 import type { PageResponse } from "../types/page/PageResponse";
-import {PagedTable} from "./PagedTable.tsx";
+import { PagedTable } from "./PagedTable.tsx";
 
-export function ActiveVisitsTable() {
+interface Props {
+    onSelectVisit(visit: ActiveVisit | null): void;
+    refreshTrigger: number;
+}
+
+export function ActiveVisitsTable({ onSelectVisit, refreshTrigger }: Props) {
     const [page, setPage] = useState(0);
     const [pageSize, setPageSize] = useState(10);
     const [data, setData] = useState<PageResponse<ActiveVisit> | null>(null);
     const [loading, setLoading] = useState(false);
+    const [selectionModel, setSelectionModel] = useState<GridRowSelectionModel>({
+        type: "include",
+        ids: new Set<GridRowId>()
+    });
 
     useEffect(() => {
         load();
-    }, [page, pageSize]);
+    }, [page, pageSize, refreshTrigger]);
+
+    useEffect(() => {
+        if (selectionModel.ids.size === 1 && data) {
+            const selectedId = Array.from(selectionModel.ids)[0];
+            const selectedVisit = data.items.find(v => v.visitId === selectedId) ?? null;
+            onSelectVisit(selectedVisit);
+        } else {
+            onSelectVisit(null);
+        }
+    }, [selectionModel, data, onSelectVisit]);
 
     async function load() {
         setLoading(true);
         try {
             const res = await getAllActive(page, pageSize);
             setData(res);
+            setSelectionModel({
+                type: "include",
+                ids: new Set()
+            });
         } finally {
             setLoading(false);
         }
@@ -37,9 +62,16 @@ export function ActiveVisitsTable() {
             flex: 1,
         },
         {
+            field: "customerEmail",
+            headerName: "Email",
+            flex: 1,
+        },
+        {
             field: "checkedInAt",
             headerName: "Checked in",
             width: 120,
+            align: "center",
+            headerAlign: "center",
             valueFormatter: (value: string) =>
                 new Date(value).toLocaleTimeString("en-GB", {
                     hour: "2-digit",
@@ -50,13 +82,16 @@ export function ActiveVisitsTable() {
             field: "lockerNumber",
             headerName: "Locker",
             width: 90,
-            valueGetter: (_, row) =>
-                row.lockerNumber ? `#${row.lockerNumber}` : "—",
+            align: "center",
+            headerAlign: "center",
+            valueGetter: (_, row) => row.lockerNumber ?? "—",
         },
         {
             field: "actions",
-            headerName: "",
+            headerName: "Actions",
             width: 130,
+            align: "center",
+            headerAlign: "center",
             sortable: false,
             renderCell: (params) => (
                 <button
@@ -82,8 +117,14 @@ export function ActiveVisitsTable() {
                     setPage(page);
                     setPageSize(size);
                 }}
+                checkboxSelection={false}
+                disableSelectionOnClick={false}
+                selectionModel={selectionModel}
+                onSelectionModelChange={(newSelectionModel) => {
+                    setSelectionModel(newSelectionModel);
+                }}
+
             />
         </div>
     );
 }
-

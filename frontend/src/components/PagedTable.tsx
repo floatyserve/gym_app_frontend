@@ -1,4 +1,4 @@
-import { DataGrid, type GridColDef } from "@mui/x-data-grid";
+import { DataGrid, type GridColDef, type GridRowSelectionModel } from "@mui/x-data-grid";
 import { useState } from "react";
 import type { PageResponse } from "../types/page/PageResponse";
 
@@ -8,6 +8,10 @@ type Props<T> = {
     loading: boolean;
     getRowId: (row: T) => number | string;
     onPageChange: (page: number, size: number) => void;
+    checkboxSelection?: boolean;
+    disableSelectionOnClick?: boolean;
+    selectionModel?: GridRowSelectionModel;
+    onSelectionModelChange?: (newSelection: GridRowSelectionModel) => void;
 };
 
 export function PagedTable<T>({
@@ -16,6 +20,10 @@ export function PagedTable<T>({
                                   loading,
                                   getRowId,
                                   onPageChange,
+                                  checkboxSelection = false,
+                                  disableSelectionOnClick = false,
+                                  selectionModel,
+                                  onSelectionModelChange,
                               }: Props<T>) {
     const [page, setPage] = useState(0);
     const [pageSize, setPageSize] = useState(10);
@@ -36,8 +44,17 @@ export function PagedTable<T>({
                 onPageChange(model.page, model.pageSize);
             }}
 
-            pageSizeOptions={[5, 10, 20]}
-            disableRowSelectionOnClick
+            pageSizeOptions={[5, 10, 20, 50]}
+
+            checkboxSelection={checkboxSelection}
+            disableRowSelectionOnClick={disableSelectionOnClick}
+            rowSelectionModel={selectionModel}
+            onRowSelectionModelChange={(newSelection) => {
+                if (onSelectionModelChange) {
+                    onSelectionModelChange(newSelection);
+                }
+            }}
+
             autoHeight
 
             sx={{
