@@ -1,4 +1,4 @@
-import api from "./client";
+import api from "./api.ts";
 import type {LoginRequest} from "../types/auth/LoginRequest.ts";
 import type {LoginResponse} from "../types/auth/LoginResponse.ts";
 

@@ -1,4 +1,4 @@
-import api from "./client.ts";
+import api from "./api.ts";
 import type {Worker} from "../types/worker/Worker.ts";
 
 const baseURL = "/workers"
