@@ -1,7 +1,7 @@
 import api from "./api.ts";
 import type {Visit} from "../types/visit/Visit.ts";
 import type {ActiveVisit} from "../types/visit/ActiveVisit.ts";
-import type {PageResponse} from "../types/page/PageResponse.ts";
+import type {PageResponse} from "../types/api/PageResponse.ts";
 import type {CheckInByAccessCardRequest, CheckInByCustomerEmailRequest} from "../types/visit/CheckInRequest.ts";
 
 const visitsUrl = "/visits";

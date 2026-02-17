@@ -1,6 +1,6 @@
 import { DataGrid, type GridColDef, type GridRowSelectionModel } from "@mui/x-data-grid";
 import { useState } from "react";
-import type { PageResponse } from "../types/page/PageResponse";
+import type { PageResponse } from "../types/api/PageResponse.ts";
 
 type Props<T> = {
     data: PageResponse<T> | null | undefined;

@@ -35,21 +35,22 @@ export function DashboardPage() {
 
     return (
         <AppLayout>
-            <QuickActionsPanel
-                onCheckIn={() => setCheckInOpen(true)}
-                onRegisterCustomer={() => setRegisterOpen(true)}
-                onAssignLocker={handleAssignLocker}
-                onSearch={() => setSearchOpen(true)}
-                canAssignLocker={canAssignLocker}
-            />
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6 max-w-4xl mx-auto">
+                <QuickActionsPanel
+                    onCheckIn={() => setCheckInOpen(true)}
+                    onRegisterCustomer={() => setRegisterOpen(true)}
+                    onAssignLocker={handleAssignLocker}
+                    onSearch={() => setSearchOpen(true)}
+                    canAssignLocker={canAssignLocker}
+                />
+
+                <LockerSnapshot refreshTrigger={refreshCounter}/>
+            </div>
+
 
             <ActiveVisitsTable
                 refreshTrigger={refreshCounter}
                 onSelectVisit={setSelectedVisit}/>
-
-            <LockerSnapshot
-                refreshTrigger={refreshCounter}
-            />
 
             <AssignLockerDialog
                 open={assignLockerOpen}

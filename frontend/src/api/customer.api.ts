@@ -1,5 +1,5 @@
 import api from "./api.ts";
-import type {PageResponse} from "../types/page/PageResponse.ts";
+import type {PageResponse} from "../types/api/PageResponse.ts";
 import type {Customer} from "../types/customer/Customer.ts";
 import type {CreateCustomerRequest} from "../types/customer/CreateCustomerRequest.ts";
 
@@ -25,8 +25,8 @@ export async function getCustomerByEmail(customerEmail: string): Promise<Custome
     ).then(res => res.data);
 }
 
-export async function createCustomer(request: CreateCustomerRequest): Promise<Customer> {
-    return await api.post(`${baseURL}`, request)
+export async function registerCustomer(request: CreateCustomerRequest): Promise<Customer> {
+    return await api.post(`${baseURL}/register`, request)
         .then(res => res.data);
 }
 

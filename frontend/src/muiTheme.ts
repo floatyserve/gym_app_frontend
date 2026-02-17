@@ -1,15 +1,20 @@
 import { createTheme } from "@mui/material/styles";
 
 export const muiTheme = createTheme({
+    cssVariables: true,
     palette: {
         mode: "dark",
         background: {
-            default: "#0f172a", // slate-900
-            paper: "#1e293b",   // slate-800
+            default: "#0f172a",
+            paper: "#1e293b",
         },
-        text: {
-            primary: "#e5e7eb", // slate-200
-            secondary: "#94a3b8",
+        primary: {
+            main: "#3b82f6",
+        },
+    },
+    components: {
+        MuiPaper: {
+            styleOverrides: { root: { backgroundImage: "none" } },
         },
     },
 });

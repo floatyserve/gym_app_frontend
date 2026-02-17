@@ -1,7 +1,7 @@
 import api from "./api.ts";
 import type {Locker} from "../types/locker/Locker.ts";
 import type {LockerStats} from "../types/locker/LockerStats.ts";
-import type {PageResponse} from "../types/page/PageResponse.ts";
+import type {PageResponse} from "../types/api/PageResponse.ts";
 
 const baseURL = "/lockers"
 

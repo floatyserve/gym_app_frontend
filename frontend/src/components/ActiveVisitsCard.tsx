@@ -4,7 +4,7 @@ import type { GridRowSelectionModel, GridColDef, GridRowId } from "@mui/x-data-g
 import { useEffect, useState } from "react";
 import { getAllActive, checkOut } from "../api/visit.api";
 import type { ActiveVisit } from "../types/visit/ActiveVisit";
-import type { PageResponse } from "../types/page/PageResponse";
+import type { PageResponse } from "../types/api/PageResponse.ts";
 import { PagedTable } from "./PagedTable.tsx";
 
 interface Props {
@@ -106,7 +106,7 @@ export function ActiveVisitsTable({ onSelectVisit, refreshTrigger }: Props) {
 
     return (
         <div className="bg-slate-800 rounded p-3">
-            <h2 className="font-semibold mb-2">Active Visits</h2>
+            <h2 className="font-semibold text-center text-xl mb-2">Active Visits</h2>
 
             <PagedTable
                 data={data}

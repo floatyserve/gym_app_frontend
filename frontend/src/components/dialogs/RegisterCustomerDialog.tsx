@@ -7,21 +7,29 @@ import {
     Button,
 } from "@mui/material";
 import {useState} from "react";
-import {createCustomer} from "../../api/customer.api.ts";
+import {registerCustomer} from "../../api/customer.api.ts";
 
 interface Props {
     open: boolean;
 
     onClose(): void;
 }
-//TODO: add access card on registration
+
 export function RegisterCustomerDialog({open, onClose}: Props) {
     const [fullName, setFullName] = useState("");
     const [email, setEmail] = useState("");
     const [phoneNumber, setPhoneNumber] = useState("");
+    const [accessCardCode, setAccessCardCode] = useState("");
 
     async function submit() {
-        await createCustomer({fullName, email, phoneNumber});
+         await registerCustomer(
+             {
+                 fullName,
+                 email,
+                 phoneNumber,
+                 cardCode: accessCardCode
+            });
+
         onClose();
     }
 
@@ -44,6 +52,11 @@ export function RegisterCustomerDialog({open, onClose}: Props) {
                         label="Phone number"
                         value={phoneNumber}
                         onChange={(e) => setPhoneNumber(e.target.value)}
+                    />
+                    <TextField
+                        label="Access card code"
+                        value={accessCardCode}
+                        onChange={(e) => setAccessCardCode(e.target.value)}
                     />
 
                     <Button variant="contained" onClick={submit}>

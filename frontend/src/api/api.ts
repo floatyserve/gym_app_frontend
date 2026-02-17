@@ -1,4 +1,7 @@
 import axios from "axios";
+import type {ApiError} from "../types/api/ApiError.ts";
+import {resolveErrorMessage} from "./errorResolver.ts";
+import toast from "react-hot-toast";
 
 const api = axios.create({
     baseURL: import.meta.env.VITE_API_URL ?? "http://localhost:8080/api",
@@ -13,11 +16,16 @@ api.interceptors.request.use((config) => {
 });
 
 api.interceptors.response.use(
-    (res) => res,
-    (error) => {
-        if (error.response?.status === 401) {
-            localStorage.removeItem("auth_token");
-        }
+    response => response,
+    error => {
+        const data = error.response?.data as ApiError | undefined;
+
+        const message = data
+            ? resolveErrorMessage(data)
+            : "Network error. Please try again.";
+
+        toast.error(message);
+
         return Promise.reject(error);
     }
 );
