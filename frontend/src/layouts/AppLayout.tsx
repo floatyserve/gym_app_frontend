@@ -20,19 +20,19 @@ export function AppLayout({ children }: { children: React.ReactNode }) {
             >
                 <List sx={{ width: 250 }}>
                     <ListItemButton onClick={() => navigate("/access-cards")}>
-                        <ListItemText primary="Search Access Cards" />
+                        <ListItemText primary="Access Cards" />
                     </ListItemButton>
 
                     <ListItemButton onClick={() => navigate("/lockers")}>
-                        <ListItemText primary="Search Lockers" />
+                        <ListItemText primary="Lockers" />
                     </ListItemButton>
 
                     <ListItemButton onClick={() => navigate("/customers")}>
-                        <ListItemText primary="Search Customers" />
+                        <ListItemText primary="Customers" />
                     </ListItemButton>
 
                     <ListItemButton onClick={() => navigate("/workers")}>
-                        <ListItemText primary="Search Workers" />
+                        <ListItemText primary="Workers" />
                     </ListItemButton>
                 </List>
             </Drawer>
