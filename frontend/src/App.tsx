@@ -5,6 +5,7 @@ import {DashboardPage} from "./pages/DashboardPage";
 import type {JSX} from "react";
 import {ProfilePage} from "./pages/ProfilePage.tsx";
 import {AccessCardsPage} from "./pages/AccessCardsPage.tsx";
+import LockersPage from "./pages/LockersPage.tsx";
 
 export function ProtectedRoute({children}: { children: JSX.Element }) {
     const {user, loading} = useAuth();
@@ -37,6 +38,11 @@ export function App() {
                     <Route path="/access-cards" element={
                         <ProtectedRoute>
                             <AccessCardsPage />
+                        </ProtectedRoute>
+                    }/>
+                    <Route path="/lockers" element={
+                        <ProtectedRoute>
+                            <LockersPage />
                         </ProtectedRoute>
                     }/>
                 </Routes>
