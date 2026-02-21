@@ -1,13 +1,14 @@
-import { useEffect, useState } from "react";
-import { TextField, Button, MenuItem } from "@mui/material";
-import type { GridColDef } from "@mui/x-data-grid";
-import { Dialog, DialogTitle, DialogContent, DialogActions } from "@mui/material";
+import {useEffect, useState} from "react";
+import {TextField, Button, MenuItem} from "@mui/material";
+import type {GridColDef} from "@mui/x-data-grid";
 
 
-import { PagedTable } from "../components/PagedTable.tsx";
+import {PagedTable} from "../components/PagedTable.tsx";
 import {createAccessCard, searchAccessCards} from "../api/access-card.api.ts";
-import type { AccessCard } from "../types/access-card/AccessCard.ts";
-import type { PageResponse } from "../types/api/PageResponse.ts";
+import type {AccessCard} from "../types/access-card/AccessCard.ts";
+import type {PageResponse} from "../types/api/PageResponse.ts";
+import {AppLayout} from "../layouts/AppLayout.tsx";
+import {CreateEntityDialog} from "../components/dialogs/CreateEntityDialog.tsx";
 
 interface Filters {
     code: string;
@@ -97,6 +98,8 @@ export function AccessCardsPage() {
             field: "code",
             headerName: "Code",
             flex: 1,
+            sortComparator: (v1, v2) =>
+                new Intl.Collator(undefined, { numeric: true, sensitivity: 'base' }).compare(v1, v2),
         },
         {
             field: "status",
@@ -113,61 +116,65 @@ export function AccessCardsPage() {
     ];
 
     return (
-        <div className="bg-slate-800 rounded p-4">
-            <h2 className="text-xl font-semibold mb-4 text-center">
-                Access Cards
-            </h2>
+        <AppLayout>
+            <div className="bg-slate-800 rounded p-4">
+                <h2 className="text-xl font-semibold mb-4 text-center">
+                    Access Cards
+                </h2>
 
-            <div className="flex gap-4 mb-4">
-                <TextField
-                    label="Card Code"
-                    value={filters.code}
-                    onChange={(e) =>
-                        handleFilterChange("code", e.target.value)
-                    }
-                />
+                <div className="flex flex-col gap-4 mb-4">
 
-                <TextField
-                    select
-                    label="Status"
-                    value={filters.status}
-                    onChange={(e) =>
-                        handleFilterChange("status", e.target.value)
-                    }
-                    sx={{ minWidth: 150 }}
-                >
-                    <MenuItem value="">Any</MenuItem>
-                    <MenuItem value="ACTIVE">ACTIVE</MenuItem>
-                    <MenuItem value="INACTIVE">INACTIVE</MenuItem>
-                    <MenuItem value="LOST">LOST</MenuItem>
-                    <MenuItem value="DAMAGED">DAMAGED</MenuItem>
-                    <MenuItem value="BLOCKED">BLOCKED</MenuItem>
-                </TextField>
+                    <div className="flex flex-wrap gap-4">
+                        <TextField
+                            label="Card Code"
+                            value={filters.code}
+                            onChange={(e) =>
+                                handleFilterChange("code", e.target.value)
+                            }
+                        />
 
-                <TextField
-                    label="Customer ID"
-                    value={filters.customerId}
-                    onChange={(e) =>
-                        handleFilterChange("customerId", e.target.value)
-                    }
-                />
+                        <TextField
+                            select
+                            label="Status"
+                            value={filters.status}
+                            onChange={(e) =>
+                                handleFilterChange("status", e.target.value)
+                            }
+                            sx={{minWidth: 150}}
+                        >
+                            <MenuItem value="">Any</MenuItem>
+                            <MenuItem value="ACTIVE">ACTIVE</MenuItem>
+                            <MenuItem value="INACTIVE">INACTIVE</MenuItem>
+                            <MenuItem value="LOST">LOST</MenuItem>
+                            <MenuItem value="DAMAGED">DAMAGED</MenuItem>
+                            <MenuItem value="BLOCKED">BLOCKED</MenuItem>
+                        </TextField>
 
-                <Button
-                    variant="contained"
-                    onClick={handleSearch}
-                >
-                    Search
-                </Button>
-            </div>
+                        <TextField
+                            label="Customer ID"
+                            value={filters.customerId}
+                            onChange={(e) =>
+                                handleFilterChange("customerId", e.target.value)
+                            }
+                        />
 
-            <div className="relative">
-                <div className="absolute right-0 -top-12">
-                    <Button
-                        variant="contained"
-                        onClick={() => setOpenCreateModal(true)}
-                    >
-                        Create Card
-                    </Button>
+                        <Button
+                            variant="contained"
+                            onClick={handleSearch}
+                        >
+                            Search
+                        </Button>
+                    </div>
+
+                    <div className="flex justify-center md:justify-end">
+                        <Button
+                            variant="contained"
+                            onClick={() => setOpenCreateModal(true)}
+                        >
+                            Create Card
+                        </Button>
+                    </div>
+
                 </div>
 
                 <PagedTable
@@ -180,15 +187,15 @@ export function AccessCardsPage() {
                         setPageSize(newSize);
                     }}
                 />
-            </div>
 
-            <Dialog
-                open={openCreateModal}
-                onClose={() => setOpenCreateModal(false)}
-            >
-                <DialogTitle>Create Access Card</DialogTitle>
 
-                <DialogContent>
+                <CreateEntityDialog
+                    open={openCreateModal}
+                    title="Create Access Card"
+                    onClose={() => setOpenCreateModal(false)}
+                    onSubmit={handleCreate}
+                    loading={creating}
+                >
                     <TextField
                         label="Card Code"
                         fullWidth
@@ -196,22 +203,9 @@ export function AccessCardsPage() {
                         value={newCode}
                         onChange={(e) => setNewCode(e.target.value)}
                     />
-                </DialogContent>
+                </CreateEntityDialog>
 
-                <DialogActions>
-                    <Button onClick={() => setOpenCreateModal(false)}>
-                        Cancel
-                    </Button>
-                    <Button
-                        variant="contained"
-                        onClick={handleCreate}
-                        disabled={creating}
-                    >
-                        Create
-                    </Button>
-                </DialogActions>
-            </Dialog>
-
-        </div>
+            </div>
+        </AppLayout>
     );
 }
