@@ -26,6 +26,16 @@ export async function createLocker(
         .then(res => res.data);
 }
 
+export async function markLockerOutOfOrder(lockerId: number): Promise<Locker> {
+    return await api.post(`${baseURL}/${lockerId}/out-of-order`)
+        .then(res => res.data);
+}
+
+export async function markLockerAvailable(lockerId: number): Promise<Locker> {
+    return await api.post(`${baseURL}/${lockerId}/restore`)
+        .then(res => res.data);
+}
+
 export async function reassignLockerToVisitAutomatically(visitId: number): Promise<Locker> {
     return await api.post(`/visits/${visitId}${baseURL}/reassign`)
         .then(res => res.data);

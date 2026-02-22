@@ -1,13 +1,13 @@
-import { useEffect, useState } from "react";
-import { TextField, Button, MenuItem } from "@mui/material";
-import type { GridColDef } from "@mui/x-data-grid";
+import {useEffect, useState} from "react";
+import {TextField, Button, MenuItem} from "@mui/material";
+import type {GridColDef} from "@mui/x-data-grid";
 
-import { PagedTable } from "../components/PagedTable.tsx";
-import { createLocker, searchLockers } from "../api/locker.api.ts";
-import type { PageResponse } from "../types/api/PageResponse.ts";
-import type { Locker } from "../types/locker/Locker.ts";
-import { CreateEntityDialog } from "../components/dialogs/CreateEntityDialog.tsx";
-import { AppLayout } from "../layouts/AppLayout.tsx";
+import {PagedTable} from "../components/PagedTable.tsx";
+import {createLocker, markLockerAvailable, markLockerOutOfOrder, searchLockers} from "../api/locker.api.ts";
+import type {PageResponse} from "../types/api/PageResponse.ts";
+import type {Locker} from "../types/locker/Locker.ts";
+import {CreateEntityDialog} from "../components/dialogs/CreateEntityDialog.tsx";
+import {AppLayout} from "../layouts/AppLayout.tsx";
 
 interface Filters {
     number: string;
@@ -33,6 +33,8 @@ function LockersPage() {
     const [openCreateModal, setOpenCreateModal] = useState(false);
     const [newNumber, setNewNumber] = useState("");
     const [creating, setCreating] = useState(false);
+
+    const [processingId, setProcessingId] = useState<number | null>(null);
 
     useEffect(() => {
         if (appliedFilters) {
@@ -99,6 +101,25 @@ function LockersPage() {
         }
     }
 
+    async function handleOutOfOrder(id: number) {
+        setProcessingId(id);
+        try {
+            await markLockerOutOfOrder(id);
+            await load();
+        } finally {
+            setProcessingId(null);
+        }
+    }
+
+    async function handleRestore(id: number) {
+        try {
+            await markLockerAvailable(id);
+            await load();
+        } catch (err) {
+            console.error("Failed to restore locker", err);
+        }
+    }
+
     const columns: GridColDef[] = [
         {
             field: "number",
@@ -118,6 +139,46 @@ function LockersPage() {
             flex: 1,
             align: "center",
             headerAlign: "center",
+        },
+        {
+            field: "actions",
+            headerName: "Actions",
+            flex: 1,
+            align: "center",
+            headerAlign: "center",
+            sortable: false,
+            filterable: false,
+            renderCell: (params) => {
+                const row = params.row as Locker;
+
+                if (row.status === "AVAILABLE") {
+                    return (
+                        <Button
+                            variant="outlined"
+                            size="small"
+                            disabled={row.occupied || processingId === row.id}
+                            onClick={() => handleOutOfOrder(row.id)}
+                        >
+                            Out of Order
+                        </Button>
+                    );
+                }
+
+                if (row.status === "OUT_OF_ORDER") {
+                    return (
+                        <Button
+                            variant="outlined"
+                            size="small"
+                            disabled={row.occupied || processingId === row.id}
+                            onClick={() => handleRestore(row.id)}
+                        >
+                            Restore
+                        </Button>
+                    );
+                }
+
+                return null;
+            },
         },
     ];
 
@@ -145,7 +206,7 @@ function LockersPage() {
                             onChange={(e) =>
                                 handleFilterChange("status", e.target.value)
                             }
-                            sx={{ minWidth: 150 }}
+                            sx={{minWidth: 150}}
                         >
                             <MenuItem value="">Any</MenuItem>
                             <MenuItem value="AVAILABLE">AVAILABLE</MenuItem>
@@ -159,7 +220,7 @@ function LockersPage() {
                             onChange={(e) =>
                                 handleFilterChange("occupied", e.target.value)
                             }
-                            sx={{ minWidth: 150 }}
+                            sx={{minWidth: 150}}
                         >
                             <MenuItem value="">Any</MenuItem>
                             <MenuItem value="true">Yes</MenuItem>
