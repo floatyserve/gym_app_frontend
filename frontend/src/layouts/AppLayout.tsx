@@ -31,7 +31,7 @@ export function AppLayout({ children }: { children: React.ReactNode }) {
                         <ListItemText primary="Customers" />
                     </ListItemButton>
 
-                    <ListItemButton onClick={() => navigate("/workers")}>
+                    <ListItemButton onClick={() => navigate("/staff")}>
                         <ListItemText primary="Workers" />
                     </ListItemButton>
                 </List>
