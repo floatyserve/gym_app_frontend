@@ -16,6 +16,9 @@ export function resolveErrorMessage(error: ApiError): string {
         case "BAD_REQUEST":
             return handleBadRequestError(error);
 
+        case "VALIDATION_ERROR":
+            return handleValidationError(error);
+
         default:
             return "Something went wrong. Please try again.";
     }
@@ -51,4 +54,8 @@ function handleBadRequestError(error: ApiError): string {
     } | undefined;
 
     return context?.reason ? `${context.reason}` : "Bad request";
+}
+
+function handleValidationError(error: ApiError): string {
+    return error?.message ? `${error.message}` : "Validation error";
 }
