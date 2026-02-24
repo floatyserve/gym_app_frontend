@@ -1,9 +1,7 @@
 import { useEffect, useState } from "react";
 import { useAuth } from "../context/AuthContext";
-import { getById as getUserById } from "../api/user.api";
-import { getByUserId as getWorkerByUserId } from "../api/worker.api";
-import type { User } from "../types/user/User.ts";
-import type { Worker } from "../types/worker/Worker.ts";
+import { getSelf} from "../api/worker.api";
+import type { DetailedWorkerInfo } from "../types/worker/Worker.ts";
 import { AppLayout } from "../layouts/AppLayout.tsx";
 
 function InfoRow({ label, value }: { label: string; value: React.ReactNode }) {
@@ -17,8 +15,7 @@ function InfoRow({ label, value }: { label: string; value: React.ReactNode }) {
 
 export function ProfilePage() {
     const { user } = useAuth();
-    const [userData, setUserData] = useState<User | null>(null);
-    const [workerData, setWorkerData] = useState<Worker | null>(null);
+    const [data, setData] = useState<DetailedWorkerInfo | null>(null);
     const [loading, setLoading] = useState(true);
 
     useEffect(() => {
@@ -26,11 +23,8 @@ export function ProfilePage() {
             if (!user) return;
 
             try {
-                const fetchedUser = await getUserById(user.id);
-                setUserData(fetchedUser);
-
-                const fetchedWorker = await getWorkerByUserId(user.id);
-                setWorkerData(fetchedWorker);
+                const fetchedWorker = await getSelf();
+                setData(fetchedWorker);
             } finally {
                 setLoading(false);
             }
@@ -71,89 +65,62 @@ export function ProfilePage() {
         );
     }
 
-    if (!userData) {
-        return (
-            <AppLayout>
-                <div className="p-6 text-red-400 text-center">
-                    No user data found.
-                </div>
-            </AppLayout>
-        );
-    }
-
     return (
         <AppLayout>
             <div className="max-w-2xl mx-auto py-8 px-4">
                 <h1 className="text-3xl font-bold text-white mb-8">My Profile</h1>
 
-                {/* Main Card Container */}
                 <div className="bg-slate-800 rounded-2xl shadow-xl border border-slate-700/50 overflow-hidden">
 
-                    {/* Header / Avatar Section */}
                     <div className="p-6 sm:p-8 bg-slate-800/50 border-b border-slate-700">
+
                         <div className="flex items-center gap-6">
-                            {/* Avatar Placeholder */}
                             <div className="h-20 w-20 rounded-full bg-blue-600 flex items-center justify-center text-3xl font-bold text-white shadow-lg shadow-blue-900/20">
-                                {workerData
-                                    ? workerData.firstName[0].toUpperCase()
-                                    : userData.email[0].toUpperCase()}
+                                {data && data.firstName[0].toUpperCase()}
                             </div>
 
-                            {/* Name & Role */}
                             <div>
                                 <h2 className="text-2xl font-bold text-white">
-                                    {workerData
-                                        ? `${workerData.firstName} ${workerData.lastName}`
+                                    {data
+                                        ? `${data.firstName} ${data.lastName}`
                                         : "User Account"}
                                 </h2>
                                 <div className="flex items-center gap-2 mt-1">
                                     <span className="px-2 py-0.5 rounded text-xs font-semibold bg-blue-900/30 text-blue-200 border border-blue-800">
-                                        {userData.role}
+                                        {data?.role}
                                     </span>
                                     <span
                                         className={`px-2 py-0.5 rounded text-xs font-semibold border ${
-                                            userData.active
+                                            data?.active
                                                 ? "bg-emerald-900/30 text-emerald-300 border-emerald-800"
                                                 : "bg-red-900/30 text-red-300 border-red-800"
                                         }`}
                                     >
-                                        {userData.active ? "Active" : "Inactive"}
+                                        {data?.active ? "Active" : "Inactive"}
                                     </span>
                                 </div>
                             </div>
                         </div>
                     </div>
 
-                    {/* Data Sections */}
                     <div className="p-6 sm:p-8 space-y-8">
 
-                        {/* Account Details */}
-                        <section>
-                            <h3 className="text-lg font-semibold text-white mb-4 flex items-center gap-2">
-                                Account Details
-                            </h3>
-                            <div className="bg-slate-900/50 rounded-xl p-4 border border-slate-700/50">
-                                <InfoRow label="Email Address" value={userData.email} />
-                                <InfoRow label="User ID" value={<span className="font-mono text-xs">{userData.id}</span>} />
-                            </div>
-                        </section>
-
-                        {/* Personal Information (Worker Data) */}
-                        {workerData && (
+                        {data && (
                             <section>
                                 <h3 className="text-lg font-semibold text-white mb-4 flex items-center gap-2">
                                     Personal Information
                                 </h3>
                                 <div className="bg-slate-900/50 rounded-xl p-4 border border-slate-700/50">
-                                    <InfoRow label="Full Name" value={`${workerData.firstName} ${workerData.lastName}`} />
-                                    <InfoRow label="Phone Number" value={workerData.phoneNumber} />
-                                    <InfoRow label="Birth Date" value={formatDate(workerData.birthDate)} />
-                                    <InfoRow label="Date Hired" value={formatDateTime(workerData.hiredAt)} />
+                                    <InfoRow label="User ID" value={<span className="font-mono text-xs">{data?.id}</span>} />
+                                    <InfoRow label="Email Address" value={data?.email} />
+                                    <InfoRow label="Full Name" value={`${data.firstName} ${data.lastName}`} />
+                                    <InfoRow label="Phone Number" value={data.phoneNumber} />
+                                    <InfoRow label="Birth Date" value={formatDate(data.birthDate)} />
+                                    <InfoRow label="Hire Date" value={formatDateTime(data.hiredAt)} />
                                 </div>
                             </section>
                         )}
 
-                        {/* Actions */}
                         <div className="pt-4">
                             <button
                                 onClick={() => alert("TODO: implement")}
