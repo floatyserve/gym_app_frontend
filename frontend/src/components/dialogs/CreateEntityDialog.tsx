@@ -1,6 +1,12 @@
-import { Dialog, DialogTitle, DialogContent, DialogActions, Button } from "@mui/material";
+import {
+    Dialog,
+    DialogTitle,
+    DialogContent,
+    DialogActions,
+    Button,
+    Divider
+} from "@mui/material";
 import type {ReactNode} from "react";
-
 
 interface CreateEntityDialogProps {
     open: boolean;
@@ -22,14 +28,23 @@ export function CreateEntityDialog({
                                        children,
                                    }: CreateEntityDialogProps) {
     return (
-        <Dialog open={open} onClose={onClose} fullWidth maxWidth="sm">
-            <DialogTitle>{title}</DialogTitle>
+        <Dialog
+            open={open}
+            onClose={onClose}
+            fullWidth
+            maxWidth="sm"
+        >
+            <DialogTitle sx={{ pb: 1 }}>
+                {title}
+            </DialogTitle>
 
-            <DialogContent>
+            <Divider />
+
+            <DialogContent sx={{ pt: 3 }}>
                 {children}
             </DialogContent>
 
-            <DialogActions>
+            <DialogActions sx={{ px: 3, pb: 2 }}>
                 <Button onClick={onClose}>
                     Cancel
                 </Button>
