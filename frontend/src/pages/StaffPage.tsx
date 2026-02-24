@@ -1,7 +1,7 @@
 import {useEffect, useState} from "react";
 import type {OnboardWorkerRequest} from "../types/worker/OnboardWorkerRequest.ts";
 import type {PageResponse} from "../types/api/PageResponse.ts";
-import {getAllWorkers, onboardWorker} from "../api/worker.api.ts";
+import {getAllWorkers, getWorkerById, onboardWorker, updateWorker} from "../api/worker.api.ts";
 import {AppLayout} from "../layouts/AppLayout.tsx";
 import type {GridColDef} from "@mui/x-data-grid";
 import type {DetailedWorkerInfo, SimpleWorkerInfo} from "../types/worker/Worker.ts";
@@ -9,6 +9,7 @@ import {Box, Button, MenuItem, TextField} from "@mui/material";
 import {PagedTable} from "../components/PagedTable.tsx";
 import {CreateEntityDialog} from "../components/dialogs/CreateEntityDialog.tsx";
 import toast from "react-hot-toast";
+import {DetailsDialog} from "../components/dialogs/DetailsDialog.tsx";
 
 function StaffPage() {
     const [page, setPage] = useState(0);
@@ -27,6 +28,7 @@ function StaffPage() {
         phoneNumber: "",
         birthDate: "",
     });
+
     function resetCreateFields() {
         setCreateFields({
             email: "",
@@ -40,6 +42,14 @@ function StaffPage() {
     }
 
     const [creating, setCreating] = useState(false);
+
+    const [selectedWorkerId, setSelectedWorkerId] = useState<number | null>(null);
+    const [selectedWorker, setSelectedWorker] = useState<DetailedWorkerInfo | null>(null);
+    const [detailsLoading, setDetailsLoading] = useState(false);
+
+    const [editMode, setEditMode] = useState(false);
+    const [editableWorker, setEditableWorker] = useState<DetailedWorkerInfo | null>(null);
+    const [updating, setUpdating] = useState(false);
 
     useEffect(() => {
         load();
@@ -66,6 +76,7 @@ function StaffPage() {
         const isEmpty = (v: string) => !v || !v.trim();
 
         if (Object.values(createFields).some(isEmpty)) {
+            console.log(createFields);
             toast.error("All fields are required");
             return;
         }
@@ -78,16 +89,49 @@ function StaffPage() {
             toast.success("Created new worker");
             resetCreateFields();
             await load();
-        }
-        finally {
+        } finally {
             setCreating(false);
         }
     }
 
-    function showDetails(id: number) {
-        //TODO: show modal with details with the option of editing entity
-        console.log(id);
+    async function handleUpdate() {
+        if (!selectedWorker || !editableWorker) return;
+
+        setUpdating(true);
+
+        try {
+            const updated = await updateWorker(selectedWorker.id, editableWorker);
+
+            setSelectedWorker(updated);
+            setEditableWorker(updated);
+            setEditMode(false);
+
+            toast.success("Worker updated");
+
+            await load();
+        } finally {
+            setUpdating(false);
+        }
     }
+
+    function handleCancelEdit() {
+        setEditableWorker(selectedWorker);
+        setEditMode(false);
+    }
+
+    async function showDetails(id: number) {
+        setSelectedWorkerId(id);
+        setDetailsLoading(true);
+
+        try {
+            const data = await getWorkerById(id);
+            setSelectedWorker(data);
+            setEditableWorker(data);
+        } finally {
+            setDetailsLoading(false);
+        }
+    }
+
 
     const columns: GridColDef[] = [
         {field: "id", headerName: "ID", align: "center", headerAlign: "center", width: 70},
@@ -155,37 +199,237 @@ function StaffPage() {
                 >
                     <Box
                         display="grid"
-                        gridTemplateColumns={{ xs: "1fr", md: "1fr 1fr" }}
+                        gridTemplateColumns={{xs: "1fr", md: "1fr 1fr"}}
                         gap={3}
                     >
-                        <TextField fullWidth label="Email" />
-                        <TextField fullWidth label="Password" />
+                        <TextField
+                            fullWidth
+                            label="Email"
+                            value={createFields.email}
+                            onChange={(e) =>
+                                setCreateFields({
+                                    ...createFields,
+                                    email: e.target.value
+                                })
+                            }
+                        />
+                        <TextField
+                            fullWidth
+                            label="Password"
+                            value={createFields.password}
+                            onChange={(e) =>
+                                setCreateFields({
+                                    ...createFields,
+                                    password: e.target.value
+                                })
+                            }
+                        />
 
                         <TextField
                             fullWidth
                             label="Role"
                             select
-                            sx={{ gridColumn: { md: "span 2" } }}
+                            value={createFields.role}
+                            onChange={(e) =>
+                                setCreateFields({
+                                    ...createFields,
+                                    role: e.target.value
+                                })
+                            }
+                            sx={{gridColumn: {md: "span 2"}}}
                         >
-                            <MenuItem defaultValue="" sx={{
-                                textDecoration: "italic",
-                                color: "text.secondary",
-                            }}>Role</MenuItem>
+                            <MenuItem value="">
+                                <em>Select role</em>
+                            </MenuItem>
                             <MenuItem value="ADMIN">Admin</MenuItem>
                             <MenuItem value="RECEPTIONIST">Receptionist</MenuItem>
                         </TextField>
 
-                        <TextField fullWidth label="First Name" />
-                        <TextField fullWidth label="Last Name" />
-                        <TextField fullWidth label="Phone Number" />
+                        <TextField
+                            fullWidth
+                            label="First Name"
+                            value={createFields.firstName}
+                            onChange={(e) =>
+                                setCreateFields({
+                                    ...createFields,
+                                    firstName: e.target.value
+                                })
+                            }
+                        />
+                        <TextField
+                            fullWidth
+                            label="Last Name"
+                            value={createFields.lastName}
+                            onChange={(e) =>
+                                setCreateFields({
+                                    ...createFields,
+                                    lastName: e.target.value
+                                })
+                            }
+                        />
+                        <TextField
+                            fullWidth
+                            label="Phone Number"
+                            value={createFields.phoneNumber}
+                            onChange={(e) =>
+                                setCreateFields({
+                                    ...createFields,
+                                    phoneNumber: e.target.value
+                                })
+                            }
+                        />
                         <TextField
                             fullWidth
                             label="Birth Date"
                             type="date"
-                            slotProps={{ inputLabel: { shrink: true } }}
+                            slotProps={{inputLabel: {shrink: true}}}
+                            value={createFields.birthDate}
+                            onChange={(e) =>
+                                setCreateFields({
+                                    ...createFields,
+                                    birthDate: e.target.value
+                                })
+                            }
                         />
                     </Box>
                 </CreateEntityDialog>
+                <DetailsDialog
+                    open={selectedWorkerId !== null}
+                    title="Worker Details"
+                    onClose={() => {
+                        setSelectedWorkerId(null);
+                        setSelectedWorker(null);
+                        setEditMode(false);
+                    }}
+                    actions={
+                        editMode ? (
+                            <>
+                                <Button onClick={handleCancelEdit}>
+                                    Cancel
+                                </Button>
+                                <Button
+                                    variant="contained"
+                                    onClick={handleUpdate}
+                                    disabled={updating}
+                                >
+                                    Save
+                                </Button>
+                            </>
+                        ) : (
+                            <>
+                                <Button onClick={() => setEditMode(true)}>
+                                    Edit
+                                </Button>
+                                <Button onClick={() => {
+                                    setSelectedWorkerId(null);
+                                    setSelectedWorker(null);
+                                }}>
+                                    Close
+                                </Button>
+                            </>
+                        )
+                    }
+                >
+                    {detailsLoading && <div>Loading...</div>}
+
+                    {!detailsLoading && editableWorker && (
+                        <Box
+                            display="grid"
+                            gridTemplateColumns="1fr 1fr"
+                            gap={2}
+                        >
+                            <TextField
+                                label="Email"
+                                value={editableWorker.email}
+                                fullWidth
+                                size="small"
+                                disabled={!editMode}
+                                onChange={(e) =>
+                                    setEditableWorker({
+                                        ...editableWorker,
+                                        email: e.target.value
+                                    })
+                                }
+                            />
+
+                            <TextField
+                                select
+                                label="Role"
+                                value={editableWorker.role}
+                                fullWidth
+                                size="small"
+                                disabled={!editMode}
+                                onChange={(e) =>
+                                    setEditableWorker({
+                                        ...editableWorker,
+                                        role: e.target.value
+                                    })
+                                }
+                            >
+                                <MenuItem value="ADMIN">Admin</MenuItem>
+                                <MenuItem value="RECEPTIONIST">Receptionist</MenuItem>
+                            </TextField>
+
+                            <TextField
+                                label="First Name"
+                                value={editableWorker.firstName}
+                                fullWidth
+                                size="small"
+                                disabled={!editMode}
+                                onChange={(e) =>
+                                    setEditableWorker({
+                                        ...editableWorker,
+                                        firstName: e.target.value
+                                    })
+                                }
+                            />
+
+                            <TextField
+                                label="Last Name"
+                                value={editableWorker.lastName}
+                                fullWidth
+                                size="small"
+                                disabled={!editMode}
+                                onChange={(e) =>
+                                    setEditableWorker({
+                                        ...editableWorker,
+                                        lastName: e.target.value
+                                    })
+                                }
+                            />
+
+                            <TextField
+                                label="Phone Number"
+                                value={editableWorker.phoneNumber}
+                                fullWidth
+                                size="small"
+                                disabled={!editMode}
+                                onChange={(e) =>
+                                    setEditableWorker({
+                                        ...editableWorker,
+                                        phoneNumber: e.target.value
+                                    })
+                                }
+                            />
+
+                            <TextField
+                                type="date"
+                                label="Birth Date"
+                                value={editableWorker.birthDate}
+                                fullWidth
+                                size="small"
+                                disabled={!editMode}
+                                slotProps={{inputLabel: {shrink: true}}}
+                                onChange={(e) =>
+                                    setEditableWorker({
+                                        ...editableWorker,
+                                        birthDate: e.target.value
+                                    })
+                                }
+                            />
+                        </Box>
+                    )}
+                </DetailsDialog>
             </div>
         </AppLayout>
     );
