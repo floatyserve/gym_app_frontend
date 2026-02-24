@@ -210,7 +210,7 @@ function LockersPage() {
                         >
                             <MenuItem value="">Any</MenuItem>
                             <MenuItem value="AVAILABLE">AVAILABLE</MenuItem>
-                            <MenuItem value="OUT_OF_ORDER">OUT_OF_ORDER</MenuItem>
+                            <MenuItem value="OUT_OF_ORDER">OUT OF ORDER</MenuItem>
                         </TextField>
 
                         <TextField
