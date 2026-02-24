@@ -57,5 +57,22 @@ function handleBadRequestError(error: ApiError): string {
 }
 
 function handleValidationError(error: ApiError): string {
-    return error?.message ? `${error.message}` : "Validation error";
+    if (!error.message) {
+        return "Validation error";
+    }
+
+    if (!error.message.includes(':')) {
+        return error.message;
+    }
+
+    const [messageString, fieldsString] = error.message.split(': ');
+
+    const formattedFields = (fieldsString || "").split(',').map(field => {
+        return field
+            .replace(/([A-Z])/g, ' $1')
+            .replace(/^./, str => str.toUpperCase())
+            .trim();
+    });
+
+    return `${messageString}: ${formattedFields.join(', ')}`;
 }
