@@ -3,7 +3,7 @@ import type {OnboardWorkerRequest} from "../../../types/worker/OnboardWorkerRequ
 import toast from "react-hot-toast";
 import {onboardWorker} from "../../../api/worker.api.ts";
 import {CreateEntityDialog} from "../../../components/dialogs/CreateEntityDialog.tsx";
-import {Box, TextField} from "@mui/material";
+import {Box, MenuItem, TextField} from "@mui/material";
 
 interface Props {
     open: boolean;
@@ -56,33 +56,47 @@ export function CreateWorkerDialog({open, onClose, onCreated}: Props) {
                     label="First Name"
                     fullWidth
                     value={form.firstName}
-                    onChange={(e) => setForm({...form, firstName: e.target.value})}
+                    onChange={(e) =>
+                        setForm({...form, firstName: e.target.value})
+                    }
                 />
                 <TextField
                     label="Last Name"
                     fullWidth
                     value={form.lastName}
-                    onChange={(e) => setForm({...form, lastName: e.target.value})}
+                    onChange={(e) =>
+                        setForm({...form, lastName: e.target.value})
+                    }
                 />
                 <TextField
                     label="Email"
                     fullWidth
                     value={form.email}
-                    onChange={(e) => setForm({...form, email: e.target.value})}
+                    onChange={(e) =>
+                        setForm({...form, email: e.target.value})
+                    }
                 />
                 <TextField
                     label="Password"
-                    type="password"
                     fullWidth
                     value={form.password}
-                    onChange={(e) => setForm({...form, password: e.target.value})}
+                    onChange={(e) =>
+                        setForm({...form, password: e.target.value})}
                 />
                 <TextField
+                    select
                     label="Role"
                     fullWidth
                     value={form.role}
-                    onChange={(e) => setForm({...form, role: e.target.value})}
-                />
+                    onChange={(e) =>
+                        setForm({...form, role: e.target.value})}
+                >
+                    <MenuItem value="">
+                        <em>Select Role</em>
+                    </MenuItem>
+                    <MenuItem value="ADMIN">Admin</MenuItem>
+                    <MenuItem value="RECEPTIONIST">Receptionist</MenuItem>
+                </TextField>
                 <TextField
                     label="Phone Number"
                     fullWidth
