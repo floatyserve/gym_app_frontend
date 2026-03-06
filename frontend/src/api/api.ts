@@ -20,6 +20,12 @@ api.interceptors.response.use(
     error => {
         const data = error.response?.data as ApiError | undefined;
 
+        if (error.response?.status === 401) {
+            localStorage.removeItem("auth_token");
+            window.location.replace("/login");
+            return Promise.reject(error);
+        }
+
         const message = data
             ? resolveErrorMessage(data)
             : "Network error. Please try again.";
