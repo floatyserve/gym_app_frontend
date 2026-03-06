@@ -1,9 +1,10 @@
-import { useEffect, useState } from "react";
-import type { DetailedWorkerInfo} from "../../../types/worker/Worker.ts";
-import { getWorkerById, updateWorker} from "../../../api/worker.api.ts";
-import { Box, Button, MenuItem, TextField } from "@mui/material";
+import {useEffect, useState} from "react";
+import type {DetailedWorkerInfo} from "../../../types/worker/Worker.ts";
+import {getWorkerById, updateWorker} from "../../../api/worker.api.ts";
+import {Box, Button, MenuItem, TextField} from "@mui/material";
 import toast from "react-hot-toast";
-import { DetailsDialog } from "../../../components/dialogs/DetailsDialog.tsx";
+import {DetailsDialog} from "../../../components/dialogs/DetailsDialog.tsx";
+import {activateUser, deactivateUser} from "../../../api/user.api.ts";
 
 interface Props {
     workerId: number | null;
@@ -11,12 +12,13 @@ interface Props {
     onUpdated?: () => void;
 }
 
-export function WorkerDetailsDialog({ workerId, onClose, onUpdated }: Props) {
+export function WorkerDetailsDialog({workerId, onClose, onUpdated}: Props) {
     const [loading, setLoading] = useState(false);
     const [updating, setUpdating] = useState(false);
     const [worker, setWorker] = useState<DetailedWorkerInfo | null>(null);
     const [editMode, setEditMode] = useState(false);
     const [editableWorker, setEditableWorker] = useState<DetailedWorkerInfo | null>(null);
+    const [activating, setActivating] = useState(false);
 
     useEffect(() => {
         if (!workerId) return;
@@ -49,6 +51,32 @@ export function WorkerDetailsDialog({ workerId, onClose, onUpdated }: Props) {
             if (onUpdated) onUpdated();
         } finally {
             setUpdating(false);
+        }
+    }
+
+    async function handleActivate() {
+        if (!worker) return;
+
+        setActivating(true);
+        try {
+            await activateUser(worker.userId);
+            setWorker(prev => prev ? {...prev, active: true} : prev);
+            toast.success("User activated");
+        } finally {
+            setActivating(false);
+        }
+    }
+
+    async function handleDeactivate() {
+        if (!worker) return;
+
+        setActivating(true);
+        try {
+            await deactivateUser(worker.userId);
+            setWorker(prev => prev ? {...prev, active: false} : prev);
+            toast.success("User deactivated");
+        } finally {
+            setActivating(false);
         }
     }
 
@@ -86,7 +114,7 @@ export function WorkerDetailsDialog({ workerId, onClose, onUpdated }: Props) {
                         fullWidth
                         disabled={!editMode}
                         onChange={(e) =>
-                            setEditableWorker({ ...editableWorker, email: e.target.value })
+                            setEditableWorker({...editableWorker, email: e.target.value})
                         }
                     />
 
@@ -97,7 +125,7 @@ export function WorkerDetailsDialog({ workerId, onClose, onUpdated }: Props) {
                         fullWidth
                         disabled={!editMode}
                         onChange={(e) =>
-                            setEditableWorker({ ...editableWorker, role: e.target.value })
+                            setEditableWorker({...editableWorker, role: e.target.value})
                         }
                     >
                         <MenuItem value="ADMIN">Admin</MenuItem>
@@ -110,7 +138,7 @@ export function WorkerDetailsDialog({ workerId, onClose, onUpdated }: Props) {
                         fullWidth
                         disabled={!editMode}
                         onChange={(e) =>
-                            setEditableWorker({ ...editableWorker, firstName: e.target.value })
+                            setEditableWorker({...editableWorker, firstName: e.target.value})
                         }
                     />
 
@@ -120,7 +148,7 @@ export function WorkerDetailsDialog({ workerId, onClose, onUpdated }: Props) {
                         fullWidth
                         disabled={!editMode}
                         onChange={(e) =>
-                            setEditableWorker({ ...editableWorker, lastName: e.target.value })
+                            setEditableWorker({...editableWorker, lastName: e.target.value})
                         }
                     />
 
@@ -130,7 +158,7 @@ export function WorkerDetailsDialog({ workerId, onClose, onUpdated }: Props) {
                         fullWidth
                         disabled={!editMode}
                         onChange={(e) =>
-                            setEditableWorker({ ...editableWorker, phoneNumber: e.target.value })
+                            setEditableWorker({...editableWorker, phoneNumber: e.target.value})
                         }
                     />
 
@@ -140,9 +168,9 @@ export function WorkerDetailsDialog({ workerId, onClose, onUpdated }: Props) {
                         value={editableWorker.birthDate}
                         fullWidth
                         disabled={!editMode}
-                        slotProps={{ inputLabel: { shrink: true } }}
+                        slotProps={{inputLabel: {shrink: true}}}
                         onChange={(e) =>
-                            setEditableWorker({ ...editableWorker, birthDate: e.target.value })
+                            setEditableWorker({...editableWorker, birthDate: e.target.value})
                         }
                     />
 
@@ -152,11 +180,32 @@ export function WorkerDetailsDialog({ workerId, onClose, onUpdated }: Props) {
                         value={editableWorker.hiredAt}
                         fullWidth
                         disabled
-                        slotProps={{ inputLabel: { shrink: true } }}
+                        slotProps={{inputLabel: {shrink: true}}}
                     />
+
+                    <Button
+                        sx={
+                            {
+                                height: "fit-content",
+                                justifySelf: "center",
+                                alignSelf: "center"
+                            }
+                        }
+                        variant="contained"
+                        disabled={activating}
+                        color={worker?.active ? "error" : "success"}
+                        onClick={() => {
+                            if (worker?.active) {
+                                handleDeactivate();
+                            } else {
+                                handleActivate();
+                            }
+                        }}
+                    >
+                        {activating ? "Processing..." : worker?.active ? "Deactivate" : "Activate"}
+                    </Button>
                 </Box>
             )}
-            //TODO: allow to deactivate/reactivate worker
         </DetailsDialog>
     );
 }
