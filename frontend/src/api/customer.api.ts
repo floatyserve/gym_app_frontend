@@ -2,11 +2,14 @@ import api from "./api.ts";
 import type {PageResponse} from "../types/api/PageResponse.ts";
 import type {Customer} from "../types/customer/Customer.ts";
 import type {CreateCustomerRequest} from "../types/customer/CreateCustomerRequest.ts";
+import type {CustomerSearchRequest} from "../types/customer/CustomerSearchRequest.ts";
 
 const baseURL = "/customers"
 
-export async function getAllCustomers(): Promise<PageResponse<Customer>> {
-    return await api.get(`${baseURL}`)
+export async function searchCustomers(
+    params: CustomerSearchRequest
+): Promise<PageResponse<Customer>> {
+    return await api.get(`${baseURL}`, {params})
         .then(res => res.data);
 }
 

@@ -7,15 +7,15 @@ import {
     Button,
 } from "@mui/material";
 import {useState} from "react";
-import {registerCustomer} from "../../api/customer.api.ts";
+import {registerCustomer} from "../../../api/customer.api.ts";
 
 interface Props {
     open: boolean;
-
     onClose(): void;
+    onRegistered?(): void;
 }
 
-export function RegisterCustomerDialog({open, onClose}: Props) {
+export function RegisterCustomerDialog({open, onClose, onRegistered}: Props) {
     const [fullName, setFullName] = useState("");
     const [email, setEmail] = useState("");
     const [phoneNumber, setPhoneNumber] = useState("");
@@ -29,7 +29,7 @@ export function RegisterCustomerDialog({open, onClose}: Props) {
                  phoneNumber,
                  cardCode: accessCardCode
             });
-
+        onRegistered?.();
         onClose();
     }
 

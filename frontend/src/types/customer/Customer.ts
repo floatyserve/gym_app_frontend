@@ -4,4 +4,5 @@ export interface Customer {
     phoneNumber: string;
     email: string;
     createdAt: string;
+    cardCode?: string;
 }
