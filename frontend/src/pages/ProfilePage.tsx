@@ -3,6 +3,7 @@ import { useAuth } from "../context/AuthContext";
 import { getSelf} from "../api/worker.api";
 import type { DetailedWorkerInfo } from "../types/worker/Worker.ts";
 import { AppLayout } from "../layouts/AppLayout.tsx";
+import {useNavigate} from "react-router-dom";
 
 function InfoRow({ label, value }: { label: string; value: React.ReactNode }) {
     return (
@@ -17,6 +18,8 @@ export function ProfilePage() {
     const { user } = useAuth();
     const [data, setData] = useState<DetailedWorkerInfo | null>(null);
     const [loading, setLoading] = useState(true);
+
+    const navigate = useNavigate()
 
     useEffect(() => {
         async function fetchProfile() {
@@ -111,7 +114,7 @@ export function ProfilePage() {
                                     Personal Information
                                 </h3>
                                 <div className="bg-slate-900/50 rounded-xl p-4 border border-slate-700/50">
-                                    <InfoRow label="User ID" value={<span className="font-mono text-xs">{data?.id}</span>} />
+                                    <InfoRow label="User ID" value={<span>{data?.id}</span>} />
                                     <InfoRow label="Email Address" value={data?.email} />
                                     <InfoRow label="Full Name" value={`${data.firstName} ${data.lastName}`} />
                                     <InfoRow label="Phone Number" value={data.phoneNumber} />
@@ -123,7 +126,7 @@ export function ProfilePage() {
 
                         <div className="pt-4">
                             <button
-                                onClick={() => alert("TODO: implement")}
+                                onClick={() => navigate("/change-password")}
                                 className="w-full sm:w-auto px-6 py-3 bg-blue-600 hover:bg-blue-500 text-white font-semibold rounded-xl shadow-lg shadow-blue-900/20 transition-all active:scale-95"
                             >
                                 Change Password
