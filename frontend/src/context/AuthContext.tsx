@@ -1,9 +1,11 @@
 import React, { createContext, useState, useEffect, useContext } from "react";
 import { jwtDecode } from "jwt-decode";
 import api from "../api/api.ts";
-import type {User} from "../types/user/User.ts";
+import type {PendingUser, User} from "../types/user/User.ts";
 import {getById} from "../api/user.api.ts";
 import {login as apiLogin} from "../api/auth.api.ts";
+
+export type SessionUser = User | PendingUser | null;
 
 interface JwtPayload {
     sub: string; // user id as string
@@ -13,16 +15,16 @@ interface JwtPayload {
 }
 
 interface AuthContextType {
-    user: User | null;
+    user: SessionUser;
     loading: boolean;
-    login: (email: string, password: string) => Promise<void>;
+    login: (email: string, password: string) => Promise<SessionUser>;
     logout: () => void;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 export function AuthProvider({ children }: { children: React.ReactNode }) {
-    const [user, setUser] = useState<User | null>(null);
+    const [user, setUser] = useState<SessionUser>(null);
     const [loading, setLoading] = useState(true);
 
     useEffect(() => {
@@ -32,8 +34,16 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
                 try {
                     const decoded = jwtDecode<JwtPayload>(token);
                     api.defaults.headers.common["Authorization"] = `Bearer ${token}`;
-                    const user = await getById(Number(decoded.sub));
-                    setUser(user);
+
+                    if (decoded.pwd_changed) {
+                        const fullUser = await getById(Number(decoded.sub));
+                        setUser(fullUser);
+                    } else {
+                        setUser({
+                            id: Number(decoded.sub),
+                            passwordChanged: false
+                        });
+                    }
                 } catch {
                     localStorage.removeItem("auth_token");
                     setUser(null);
@@ -45,7 +55,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         fetchUser();
     }, []);
 
-    async function login(email: string, password: string) {
+    async function login(email: string, password: string): Promise<SessionUser> {
         const res = await apiLogin({email, password});
         const token = res.token;
 
@@ -54,7 +64,18 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
         const decoded = jwtDecode<JwtPayload>(token);
 
-        setUser(await getById(Number(decoded.sub)));
+        if (decoded.pwd_changed) {
+            const fullUser = await getById(Number(decoded.sub));
+            setUser(fullUser);
+            return fullUser;
+        } else {
+            const pendingUser = {
+                id: Number(decoded.sub),
+                passwordChanged: false
+            };
+            setUser(pendingUser);
+            return pendingUser;
+        }
     }
 
     function logout() {

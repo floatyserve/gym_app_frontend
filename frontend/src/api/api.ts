@@ -1,6 +1,6 @@
 import axios from "axios";
-import type {ApiError} from "../types/api/ApiError.ts";
-import {resolveErrorMessage} from "./errorResolver.ts";
+import type { ApiError } from "../types/api/ApiError.ts";
+import { resolveErrorMessage } from "./errorResolver.ts";
 import toast from "react-hot-toast";
 
 const api = axios.create({
@@ -20,9 +20,16 @@ api.interceptors.response.use(
     error => {
         const data = error.response?.data as ApiError | undefined;
 
+        const authPages = ["/login", "/change-password"];
+
         if (error.response?.status === 401) {
-            localStorage.removeItem("auth_token");
-            window.location.replace("/login");
+            const isAuthPage = authPages.includes(window.location.pathname);
+
+            if (!isAuthPage) {
+                localStorage.removeItem("auth_token");
+                window.location.replace("/login");
+            }
+
             return Promise.reject(error);
         }
 

@@ -11,7 +11,7 @@ export function resolveErrorMessage(error: ApiError): string {
             return "The requested resource was not found.";
 
         case "BAD_CREDENTIALS":
-            return "Invalid email or password.";
+            return handleBadCredentialsError(error);
 
         case "BAD_REQUEST":
             return handleBadRequestError(error);
@@ -22,6 +22,12 @@ export function resolveErrorMessage(error: ApiError): string {
         default:
             return "Something went wrong. Please try again.";
     }
+}
+
+function handleBadCredentialsError(error: ApiError) : string{
+    const message = error.message;
+
+    return message ? message : "Invalid email or password.";
 }
 
 function handleAlreadyExistsError(error: ApiError): string {
@@ -56,6 +62,7 @@ function handleBadRequestError(error: ApiError): string {
     return context?.reason ? `${context.reason}` : "Bad request";
 }
 
+//TODO: improve method to read message.context
 function handleValidationError(error: ApiError): string {
     if (!error.message) {
         return "Validation error";
