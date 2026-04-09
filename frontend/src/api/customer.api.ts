@@ -3,6 +3,7 @@ import type {PageResponse} from "../types/api/PageResponse.ts";
 import type {Customer} from "../types/customer/Customer.ts";
 import type {CreateCustomerRequest} from "../types/customer/CreateCustomerRequest.ts";
 import type {CustomerSearchRequest} from "../types/customer/CustomerSearchRequest.ts";
+import type {UpdateCustomerRequest} from "../types/customer/UpdateCustomerRequest.ts";
 
 const baseURL = "/customers"
 
@@ -33,7 +34,7 @@ export async function registerCustomer(request: CreateCustomerRequest): Promise<
         .then(res => res.data);
 }
 
-export async function updateCustomer(customerId: number, request: CreateCustomerRequest): Promise<Customer> {
+export async function updateCustomer(customerId: number, request: UpdateCustomerRequest): Promise<Customer> {
     return await api.patch(`${baseURL}/${customerId}`, request)
         .then(res => res.data);
 }
