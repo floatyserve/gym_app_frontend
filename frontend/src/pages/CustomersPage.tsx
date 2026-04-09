@@ -4,6 +4,7 @@ import {Button, TextField} from "@mui/material";
 import {useCustomers} from "../features/customers/hooks/useCustomer.ts";
 import {CustomersTable} from "../features/customers/components/CustomersTable.tsx";
 import {RegisterCustomerDialog} from "../features/customers/components/RegisterCustomerDialog.tsx";
+import {CustomerDetailsDialog} from "../features/customers/components/CustomerDetailsDialog.tsx";
 
 interface Filters {
     fullName: string;
@@ -118,7 +119,6 @@ function CustomersPage() {
                         setPage(p);
                         setPageSize(s);
                     }}
-                    //TODO: open window with customer details including access card info and visits history
                     onDetails={(id) => setSelectedCustomerId(id)}
                 />
 
@@ -126,6 +126,15 @@ function CustomersPage() {
                     open={openCreate}
                     onClose={() => setOpenRegister(false)}
                     onRegistered={reload}
+                />
+
+                <CustomerDetailsDialog
+                    customerId={selectedCustomerId}
+                    onClose={() => setSelectedCustomerId(null)}
+                    onUpdate={() => {
+                        reload();
+                        setSelectedCustomerId(null);
+                    }}
                 />
 
             </div>

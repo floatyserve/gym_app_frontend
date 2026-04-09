@@ -58,7 +58,10 @@ function StaffPage() {
                 <WorkerDetailsDialog
                     workerId={selectedWorkerId}
                     onClose={() => setSelectedWorkerId(null)}
-                    onUpdated={reload}
+                    onUpdated={() => {
+                        reload();
+                        setSelectedWorkerId(null);
+                    }}
                 />
             </div>
         </AppLayout>
