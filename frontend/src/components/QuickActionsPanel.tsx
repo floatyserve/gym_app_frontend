@@ -8,7 +8,8 @@ interface Props {
     onCheckIn(): void;
     onRegisterCustomer(): void;
     onAssignLocker(): void;
-    onSearch(): void;
+    onSearchCustomers(): void;
+    onSearchVisits(): void;
     canAssignLocker: boolean;
 }
 
@@ -23,7 +24,8 @@ export function QuickActionsPanel({
                                       onCheckIn,
                                       onRegisterCustomer,
                                       onAssignLocker,
-                                      onSearch,
+                                      onSearchCustomers,
+                                      onSearchVisits,
                                       canAssignLocker,
                                   }: Props) {
 
@@ -79,10 +81,20 @@ export function QuickActionsPanel({
                         fullWidth
                         variant="outlined"
                         startIcon={<SearchIcon />}
-                        onClick={onSearch}
+                        onClick={onSearchCustomers}
                         sx={outlinedButtonStyle}
                     >
-                        Search customers / visits
+                        Search customers
+                    </Button>
+
+                    <Button
+                        fullWidth
+                        variant="outlined"
+                        startIcon={<SearchIcon />}
+                        onClick={onSearchVisits}
+                        sx={outlinedButtonStyle}
+                    >
+                        Search visits
                     </Button>
 
                     <Button

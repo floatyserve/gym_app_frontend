@@ -1,6 +1,5 @@
-import {useState} from "react";
+import {useEffect, useState} from "react";
 import {AppLayout} from "../layouts/AppLayout.tsx";
-import {ActiveVisitsTable} from "../components/ActiveVisitsCard.tsx";
 import {LockerSnapshot} from "../components/LockerSnapshot.tsx";
 import {QuickActionsPanel} from "../components/QuickActionsPanel.tsx";
 import {AssignLockerDialog} from "../components/dialogs/AssignLockerDialog.tsx";
@@ -8,6 +7,9 @@ import {CheckInDialog} from "../components/dialogs/CheckInDialog.tsx";
 import {RegisterCustomerDialog} from "../features/customers/components/RegisterCustomerDialog.tsx";
 import type {ActiveVisit} from "../types/visit/ActiveVisit";
 import {useNavigate} from "react-router-dom";
+import type {PageResponse} from "../types/api/PageResponse.ts";
+import {VisitsTable} from "../features/visits/components/VisitTable.tsx";
+import {checkOut, getAllActive} from "../api/visit.api.ts";
 
 export function DashboardPage() {
     const [assignLockerOpen, setAssignLockerOpen] = useState(false);
@@ -19,7 +21,26 @@ export function DashboardPage() {
 
     const [refreshCounter, setRefreshCounter] = useState(0);
 
+    const [page, setPage] = useState(0);
+    const [pageSize, setPageSize] = useState(10);
+    const [data, setData] = useState<PageResponse<ActiveVisit> | null>(null);
+    const [loading, setLoading] = useState(false);
+
     const navigate = useNavigate();
+
+    useEffect(() => {
+        loadActiveVisits();
+    }, [page, pageSize, refreshCounter]);
+
+    async function loadActiveVisits() {
+        setLoading(true);
+        try {
+            const res = await getAllActive(page, pageSize);
+            setData(res);
+        } finally {
+            setLoading(false);
+        }
+    }
 
     function handleAssignLocker() {
         if (!selectedVisit) {
@@ -29,10 +50,14 @@ export function DashboardPage() {
         setAssignLockerOpen(true);
     }
 
+    async function handleCheckout(visitId: number) {
+        await checkOut(visitId);
+        refreshData();
+    }
+
     function refreshData() {
         setRefreshCounter(prev => prev + 1);
     }
-
 
     return (
         <AppLayout>
@@ -41,7 +66,8 @@ export function DashboardPage() {
                     onCheckIn={() => setCheckInOpen(true)}
                     onRegisterCustomer={() => setRegisterOpen(true)}
                     onAssignLocker={handleAssignLocker}
-                    onSearch={() => navigate("/customers")}
+                    onSearchCustomers={() => navigate("/customers")}
+                    onSearchVisits={() => navigate("/visits")}
                     canAssignLocker={canAssignLocker}
                 />
 
@@ -49,9 +75,18 @@ export function DashboardPage() {
             </div>
 
 
-            <ActiveVisitsTable
-                refreshTrigger={refreshCounter}
-                onSelectVisit={setSelectedVisit}/>
+            <div className="bg-slate-800 rounded p-3">
+                <h2 className="font-semibold text-center text-xl mb-2">Active Visits</h2>
+                <VisitsTable
+                    variant="active"
+                    data={data}
+                    loading={loading}
+                    getRowId={(row) => row.visitId}
+                    onPageChange={(p, s) => { setPage(p); setPageSize(s); }}
+                    onSelectVisit={setSelectedVisit}
+                    onCheckOut={handleCheckout}
+                />
+            </div>
 
             <AssignLockerDialog
                 open={assignLockerOpen}
