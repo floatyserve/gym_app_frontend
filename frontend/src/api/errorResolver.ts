@@ -8,7 +8,7 @@ export function resolveErrorMessage(error: ApiError): string {
         }
 
         case "REFERENCE_NOT_FOUND":
-            return "The requested resource was not found.";
+            return handleReferenceNotFoundError(error);
 
         case "BAD_CREDENTIALS":
             return handleBadCredentialsError(error);
@@ -24,7 +24,13 @@ export function resolveErrorMessage(error: ApiError): string {
     }
 }
 
-function handleBadCredentialsError(error: ApiError) : string{
+function handleReferenceNotFoundError(error: ApiError) : string {
+    const message = error.message;
+
+    return message ? message : "The requested resource was not found.";
+}
+
+function handleBadCredentialsError(error: ApiError) : string {
     const message = error.message;
 
     return message ? message : "Invalid email or password.";
