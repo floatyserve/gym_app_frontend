@@ -4,8 +4,9 @@ import type {Customer} from "../types/customer/Customer.ts";
 import type {CreateCustomerRequest} from "../types/customer/CreateCustomerRequest.ts";
 import type {CustomerSearchRequest} from "../types/customer/CustomerSearchRequest.ts";
 import type {UpdateCustomerRequest} from "../types/customer/UpdateCustomerRequest.ts";
+import type {FrontDeskCheckInResponse} from "../types/checkin/FrontDeskCheckInResponse.ts";
 
-const baseURL = "/customers"
+const baseURL = "/customers";
 
 export async function searchCustomers(
     params: CustomerSearchRequest
@@ -27,6 +28,11 @@ export async function getCustomerByEmail(customerEmail: string): Promise<Custome
             }
         }
     ).then(res => res.data);
+}
+
+export async function scanCardForCheckIn(cardCode: string): Promise<FrontDeskCheckInResponse> {
+    return await api.get(`/check-in/scan/${cardCode}`)
+        .then(res => res.data);
 }
 
 export async function registerCustomer(request: CreateCustomerRequest): Promise<Customer> {
