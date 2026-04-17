@@ -1,0 +1,9 @@
+services:
+  frontend:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: gym-app-frontend
+    ports:
+      - "5173:80"
+    restart: always
