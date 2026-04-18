@@ -72,6 +72,18 @@ This project was built to demonstrate practical frontend engineering skills:
 
 ---
 
+## Example screenshots
+
+### Dashboard
+![DashboardPage](screenshots/dashboard.png)
+### Check-In Dialog
+![ChechInDialog.png](screenshots/check_in.png)
+### Search Page with Filters and Results
+![VisitSearchPage.png](screenshots/visits_page.png)
+### Staff Profile
+![ProfilePage.png](screenshots/profile_page.png)
+---
+
 ## Architecture
 
 Structured using a modular and scalable frontend architecture:
